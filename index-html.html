@@ -1,10 +1,41 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #ball,
+    #hit,
+    #stats {
+      display: block;
+      position: absolute;
+    }
+
+    #hit {
+      display: none;
+      width: 50px;
+      height: 50px;
+      border: 5px solid blue;
+      border-radius: 50%;
+    }
+
+    #stats {
+      top: 0px;
+      left: 0px;
+    }
+  </style>
   <title>HTML</title>
 </head>
 <body>
   <img src="ball.png" id="ball" width="100" height="100">
+  <div id="hit"></div>
   <script src="bower_components/stats.js/build/stats.min.js"></script>
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
   <script src="bower_components/gsap/src/minified/TweenMax.min.js"></script>
@@ -12,20 +43,61 @@
   <script src="bower_components/gsap/src/minified/plugins/CSSPlugin.min.js"></script>
   <script src="bower_components/gsap/src/minified/jquery.gsap.min.js"></script>
   <script>
-    var stats = new Stats();
-    stats.setMode(1);
+    var ball = $('#ball'),
+        body = $('body'),
+        hit = $('#hit'),
+        hitSize = hit.width() * .5,
+        stats = new Stats(),
+        win = $(window),
+        winH = win.height(),
+        winW = win.width();
 
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.left = '0px';
-    stats.domElement.style.top = '0px';
+    function addListeners () {
+      body.on('mousedown touchstart', function (event) {
+        var x = event.pageX - hitSize,
+            y = event.pageY - hitSize;
 
-    document.body.appendChild(stats.domElement);
+        event.preventDefault();
 
-    setInterval(function () {
-      stats.begin();
+        hit.css({
+          left: x,
+          top: y
+        }).show();
 
-      stats.end();
-    }, 1000 / 60);
+        return false;
+      });
+
+      body.on('mouseup touchend', function (event) {
+        event.preventDefault();
+
+        hit.hide();
+
+        return false;
+      })
+    }
+
+    function animate () {
+      requestAnimFrame(animate);
+    }
+
+    function init () {
+      stats.setMode(1);
+
+      $(stats.domElement).appendTo(body);
+
+      window.requestAnimFrame = (function () {
+        return  window.requestAnimationFrame       ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame    ||
+                function (callback) {
+                  window.setTimeout(callback, 1000 / 60);
+                };
+      })();
+
+      addListeners();
+    }
+
+    init();
   </script>
 </body>
 </html>
