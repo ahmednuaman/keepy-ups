@@ -54,8 +54,8 @@
 
     function addListeners () {
       body.on('mousedown touchstart', function (event) {
-        var x = event.pageX - hitSize,
-            y = event.pageY - hitSize;
+        var x = getCoord(event, 'pageX') - hitSize,
+            y = getCoord(event, 'pageY') - hitSize;
 
         event.preventDefault();
 
@@ -78,6 +78,11 @@
 
     function animate () {
       requestAnimFrame(animate);
+    }
+
+    function getCoord (event, prop) {
+      return  event.type === 'touchstart' ?
+              event.originalEvent.touches[0][prop] : event[prop];
     }
 
     function init () {
